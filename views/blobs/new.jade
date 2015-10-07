@@ -5,12 +5,11 @@ block content
 		#{title}
 	form#formAddBlob(name="addblob",method="post",action="/blobs")
 		p Name: 
-			input#inputName(type="text", placeholder="ex. John Smith", name="name")
-		p Badge:
-			input#inputBadge(type="number", placeholder="ex. 123456", name="badge")
-		p DOB: 
-			input#inputDob(type="date", name="dob")
-		p Are You Loved?: 
-			input#inputIsLoved(type="checkbox", name="isloved")
-		p
-			button#btnSubmit(type="submit") submit
+			input#inputName(type="text", placeholder="ex. Anything", name="name")
+		p Date:
+			input#inputDate(type="date", placeholder="ex. 1979-12-31", name="date")
+		div.input
+			span.label Data
+			textarea(name="data", cols="40", rows="5")
+		div.actions
+			input(type="submit", value="add")

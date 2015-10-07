@@ -24,6 +24,7 @@ router.route('/')
     .get(function(req, res, next) {
         //retrieve all blobs from Monogo
         mongoose.model('CrashCollection').find({}, function (err, blobs) {
+        	console.log("GET all blobs:  " +blobs);
               if (err) {
                   return console.error(err);
               } else {
@@ -32,7 +33,7 @@ router.route('/')
                       //HTML response will render the index.jade file in the views/blobs folder. We are also setting "blobs" to be an accessible variable in our jade view
                     html: function(){
                         res.render('blobs/index', {
-                              title: 'All my Blobs',
+                              title: 'All Crashes',
                               "blobs" : blobs
                           });
                     },
@@ -48,30 +49,36 @@ router.route('/')
     .post(function(req, res) {
         // Get values from POST request. These can be done through forms or REST calls. These rely on the "name" attributes for forms
         var name = req.body.name;
+        console.log("req.body.data: " +req.body.data);
         var data = req.body.data;
         var date = req.body.date;
-
+        var version = req.body.version;
+console.log("data: " + data);
         //call the create function for our database
         mongoose.model('CrashCollection').create({
             name : name,
             date : date,
-            dob : data
+            version: version,
+            data : data
         }, function (err, blob) {
               if (err) {
                   res.send("There was a problem adding the information to the database.");
               } else {
                   //Blob has been created
                   console.log('POST creating new crash data entry: ' + blob);
+                  console.log('POST res formatting');
                   res.format({
                       //HTML response will set the location and redirect back to the home page. You could also create a 'success' page if that's your thing
                     html: function(){
+                    	console.log('POST html redirect: ' );
                         // If it worked, set the header so the address bar doesn't still say /adduser
-                        res.location("blobs");
+                        res.location("");
                         // And forward to success page
-                        res.redirect("/blobs");
+                        res.redirect("/");
                     },
                     //JSON response will show the newly created blob
                     json: function(){
+                    	console.log('POST json response: ' );
                         res.json(blob);
                     }
                 });
@@ -81,12 +88,12 @@ router.route('/')
 
 /* GET New Blob page. */
 router.get('/new', function(req, res) {
-    res.render('blobs/new', { title: 'Add New Blob' });
+    res.render('blobs/new', { title: 'Add New Crash' });
 });
 
 // route middleware to validate :id
 router.param('id', function(req, res, next, id) {
-    //console.log('validating ' + id + ' exists');
+    console.log('validating ' + id + ' exists');
     //find the ID in the Database
     mongoose.model('CrashCollection').findById(id, function (err, blob) {
         //if it isn't found, we are going to repond with 404
@@ -117,17 +124,24 @@ router.param('id', function(req, res, next, id) {
 
 router.route('/:id')
   .get(function(req, res) {
-    mongoose.model('Blob').findById(req.id, function (err, blob) {
+    mongoose.model('CrashCollection').findById(req.id, function (err, blob) {
       if (err) {
         console.log('GET Error: There was a problem retrieving: ' + err);
       } else {
-        console.log('GET Retrieving ID: ' + blob._id);
-        var blobdob = blob.dob.toISOString();
-        blobdob = blobdob.substring(0, blobdob.indexOf('T'))
+      	
+      	 if ((typeof blob === 'undefined' || blob === null)){
+      	console.log("No DATA for " + req.id);
+      } else {
+		console.log('GET Retrieving ID: ' + blob._id);
+        console.log("blob data: " + blob.data);
+      }
+
+       
+        //blobdob = blobdob.substring(0, blobdob.indexOf('T'))
         res.format({
           html: function(){
               res.render('blobs/show', {
-                "blobdob" : blobdob,
+                "data" : blob.data,
                 "blob" : blob
               });
           },
@@ -143,20 +157,20 @@ router.route('/:id/edit')
 	//GET the individual blob by Mongo ID
 	.get(function(req, res) {
 	    //search for the blob within Mongo
-	    mongoose.model('Blob').findById(req.id, function (err, blob) {
+	    mongoose.model('CrashCollection').findById(req.id, function (err, blob) {
 	        if (err) {
 	            console.log('GET Error: There was a problem retrieving: ' + err);
 	        } else {
 	            //Return the blob
 	            console.log('GET Retrieving ID: ' + blob._id);
-              var blobdob = blob.dob.toISOString();
-              blobdob = blobdob.substring(0, blobdob.indexOf('T'))
+              var blobdata = blob.data;
+              //blobdata = blobdata.substring(0, blobdob.indexOf('T'))
 	            res.format({
 	                //HTML response will render the 'edit.jade' template
 	                html: function(){
 	                       res.render('blobs/edit', {
-	                          title: 'Blob' + blob._id,
-                            "blobdob" : blobdob,
+	                          title: 'Crash' + blob._id,
+                            "data" : blobdata,
 	                          "blob" : blob
 	                      });
 	                 },
@@ -174,6 +188,7 @@ router.route('/:id/edit')
        var name = req.body.name;
         var data = req.body.data;
         var date = req.body.date;
+        var version = req.body.version;
 
 
 	    //find the document by ID
@@ -182,7 +197,8 @@ router.route('/:id/edit')
 	        blob.update({
 				name : name,
 	            date : date,
-	            dob : data
+	            version: version,
+	            data : data
 	        }, function (err, blobID) {
 	          if (err) {
 	              res.send("There was a problem updating the information to the database: " + err);
@@ -191,7 +207,7 @@ router.route('/:id/edit')
 	                  //HTML responds by going back to the page or you can be fancy and create a new view that shows a success page.
 	                  res.format({
 	                      html: function(){
-	                           res.redirect("/blobs/" + blob._id);
+	                           res.redirect("/" + blob._id);
 	                     },
 	                     //JSON responds showing the updated values
 	                    json: function(){
@@ -219,7 +235,7 @@ router.route('/:id/edit')
 	                    res.format({
 	                        //HTML returns us back to the main page, or you can create a success page
 	                          html: function(){
-	                               res.redirect("/blobs");
+	                               res.redirect("/");
 	                         },
 	                         //JSON returns the item with the message that is has been deleted
 	                        json: function(){

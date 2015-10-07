@@ -6,3 +6,10 @@ body {
 a {
   color: #00B7FF;
 }
+div {
+    white-space: pre-wrap;
+    padding-left: 5px;
+}
+#actionbuttons{
+	display: -webkit-box;
+}

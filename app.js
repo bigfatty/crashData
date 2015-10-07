@@ -4,6 +4,7 @@ var express = require('express'),
     favicon = require('serve-favicon'),
     logger = require('morgan'),
     cookieParser = require('cookie-parser'),
+    mongoose = require('mongoose'),
     bodyParser = require('body-parser');
 
 var db = require('./model/db'),
@@ -11,6 +12,29 @@ var db = require('./model/db'),
 
 var routes = require('./routes/index'),
     blobs = require('./routes/blobs');
+    
+    
+    
+var CronJob = require('cron').CronJob;
+new CronJob('00 30 11 * * 1-5', function() {
+		var twoWeeksOld = new Date();
+		twoWeeksOld.setHours(twoWeeksOld.getHours()-336);
+		console.log("running cron");
+		console.log("twoWeeksOld " + JSON.stringify(twoWeeksOld));
+		
+		mongoose.model('CrashCollection').find({date: {"$lt":twoWeeksOld}},function (err, out) {
+			console.log("Less than two weeks old  data:" + JSON.stringify(out));
+		    if (err) {
+		        return;
+		    }
+		    });    
+		    
+		mongoose.model('CrashCollection').find({date: {"$lt":twoWeeksOld} }).remove().exec();	
+}, function () {
+    console.log("Cron complete:");
+  },
+  true);
+	
 
 //var users = require('./routes/users');
 
@@ -28,7 +52,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
+app.use('/', blobs);
 app.use('/blobs', blobs);
 //app.use('/users', users);
 

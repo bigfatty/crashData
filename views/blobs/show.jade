@@ -1,9 +1,10 @@
 extends ../layout
 
 block content
-    h1.
-        Infophoto #{blob._id}
-    p Name: #{blob.name}
-    p Badge: #{blob.badge}
-    p DOB: #{blobdob}
-    p Is Loved: #{blob.isloved}
+    h1(style="display: none").Id #{blob._id}
+    h2. 
+      Name: #{blob.name}
+    p Date: #{blob.date}
+    p Version: #{blob.version}
+    div
+      Data #{blob.data}

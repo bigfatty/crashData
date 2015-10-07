@@ -6,12 +6,10 @@ block content
 	form(action='/blobs/#{blob._id}/edit',method='post',name='updateblob',enctype='application/x-www-form-urlencoded')
 		p Name:
 			input#inputName(type='text', value='#{blob.name}', name='name')
-		p Badge:
-			input#inputBadge(type='number', value='#{blob.badge}', name='badge')
-		p DOB:
-			input#inputDob(type='date', value='#{blobdob}', name='dob')
-		p Are you Loved?:
-			input#inputIsLoved(type='checkbox', name='isloved', checked=('#{blob.isloved}'==='true' ? "checked" : undefined))
+		p Date:
+			input#inputBadge(type='date', value='#{blob.date}', name='date')
+		p Data:
+			input#inputDob(type='textarea',  rows=4, columns=60, value='#{blob.data}', name='data')
 		p
 			input(type='hidden',value='PUT',name='_method')
 		p

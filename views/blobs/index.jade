@@ -6,16 +6,15 @@ block content
     ul
         - each blob, i in blobs
             li
+                = blob.date
+                br
                 = blob.name
-                = blob.badge
-                = blob.dob
-                = blob.isloved
-                = blob._id
-                form(action='/blobs/#{blob._id}/edit',method='post',enctype='application/x-www-form-urlencoded')
+                div#actionbuttons
+                 form(action='/blobs/#{blob._id}/edit',method='post',enctype='application/x-www-form-urlencoded')
                     input(type='hidden',value='DELETE',name='_method')
                     button(type='submit').
                         Delete
-                p 
-                    a(href='/blobs/#{blob._id}/edit') Edit
-                p
-                    a(href='/blobs/#{blob._id}') Show
+                 div
+                    a(href='/#{blob._id}/edit') edit
+                 div   
+                    a(href='/#{blob._id}') show
